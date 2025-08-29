@@ -2,25 +2,28 @@ import psutil
 import platform
 import time
 import csv
+import requests
 from datetime import datetime
 import numpy as np
 
+
 ARQUIVO = "dados_gerais.csv"
 ARQUIVO2 = "captura_dados.csv"
+SLACK_WEBHOOK_URL = 'https://hooks.slack.com/services/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'
 
 # Cria arquivo com cabeçalho dos dados gerais do servidor (só na primeira vez)
 try:
     with open(ARQUIVO, "x", newline="") as f:
         writer = csv.writer(f, delimiter="|")
-        writer.writerow(["nomeDoSO", "RealeaseDoSO", "VersãoDoSO", "Processador", "NúcleosFísicos", "NúcleosLógicos"])
+        writer.writerow(["nomeMaquina", "nomeDoSO", "RealeaseDoSO", "VersãoDoSO", "Processador", "NúcleosFísicos", "NúcleosLógicos"])
 except FileExistsError:
     pass
 
-# Cria arquivo com cabeçalho dos dados do hardware (só na primeira vez)
+# Cria arquivo com cabeçalho dos dados do hardware 
 try:
     with open(ARQUIVO2, "x", newline="") as f:
         writer = csv.writer(f, delimiter="|")
-        writer.writerow(["timestamp", "cpu", "ramTotal", "ramUsada", "discoTotal", "discoUsado"])
+        writer.writerow(["timestamp", "nomeMaquina", "cpu", "ramTotal", "ramUsada", "discoTotal", "discoUsado"])
 except FileExistsError:
     pass
 
@@ -32,14 +35,19 @@ versaoSO = platform.version()
 processador = platform.processor()
 nucleosFisicos = psutil.cpu_count(logical=False)
 nucleosLogicos = psutil.cpu_count(logical=True)
+nomeMaquina = platform.node()
 
 with open(ARQUIVO, "a", newline="") as f:
         writer = csv.writer(f, delimiter="|")
-        writer.writerow([nomeSo, realeaseSo, versaoSO, processador, nucleosFisicos, nucleosLogicos])
+        writer.writerow([nomeMaquina, nomeSo, realeaseSo, versaoSO, processador, nucleosFisicos, nucleosLogicos])
 
-valores_cpu = []
-tempos = []
-t = 0
+
+
+# cria a função para enviar mensagem no canal de suporte usando o InfoMan
+def enviar_mensagem_slack(menssagem):
+    textoEnviado = {'text': menssagem}
+    requests.post(SLACK_WEBHOOK_URL, json=textoEnviado)
+
 
 print("\n")
 print("\n=== Iniciando Captura Contínua ===")
@@ -51,21 +59,21 @@ try:
         ramUsada = psutil.virtual_memory().percent
         discoTotal = round(psutil.disk_usage("/").total / (1024**3),2)
         discoUsado = psutil.disk_usage("/").percent
+        limiteCPU = 50
 
-        valores_cpu.append(uso)
-        tempos.append(t)
+        print(f"{timestamp} | Nome da Máquina: {nomeMaquina} | CPU: {uso}% | Ram total: {ramTotal}GB | Ram em Uso: {ramUsada}% | Disco total: {discoTotal}GB | Disco em uso: {discoUsado}%")
+       
+        if uso > limiteCPU:
+            enviar_mensagem_slack(f":warning: ALERTA NA MÁQUINA: Nome: {nomeMaquina} Uso de CPU acima de {limiteCPU}%! Atual: {uso}%")
 
-
-        if len(valores_cpu) > 0:
-            print(f"{timestamp} | CPU: {uso}% | Ram total: {ramTotal}GB | Ram em Uso: {ramUsada}% | Disco total: {discoTotal}GB | Disco em uso: {discoUsado}%")
+         
 
 
         with open(ARQUIVO2, "a", newline="") as f:
             writer = csv.writer(f, delimiter="|")
-            writer.writerow([timestamp, uso, ramTotal, ramUsada, discoTotal, discoUsado])
+            writer.writerow([timestamp, nomeMaquina, uso, ramTotal, ramUsada, discoTotal, discoUsado])
 
         time.sleep(10)
-        t += 10
 
 except KeyboardInterrupt:#(Ctrl + c)
     print("\n=== Captura finalizada ===")

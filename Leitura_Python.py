@@ -27,6 +27,7 @@ while True:
         print("\n=== Informações do Sistema ===\n")
         sistema = dfDados.iloc[0]
         sistema2 = df.iloc[0]
+        print(f"Nome da Máquina: {sistema['nomeMaquina']}")
         print(f"Sistema Operacional: {sistema['nomeDoSO']} {sistema['RealeaseDoSO']}")
         print(f"Versão: {sistema['VersãoDoSO']}")
         print(f"Processador: {sistema['Processador']}")
