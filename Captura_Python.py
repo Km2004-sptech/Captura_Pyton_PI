@@ -9,7 +9,7 @@ import numpy as np
 
 ARQUIVO = "dados_gerais.csv"
 ARQUIVO2 = "captura_dados.csv"
-SLACK_WEBHOOK_URL = 'https://hooks.slack.com/services/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'
+SLACK_WEBHOOK_URL = 'https://hooks.slack.com/services/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'
 
 # Cria arquivo com cabeçalho dos dados gerais do servidor (só na primeira vez)
 try:
@@ -64,8 +64,8 @@ try:
         print(f"{timestamp} | Nome da Máquina: {nomeMaquina} | CPU: {uso}% | Ram total: {ramTotal}GB | Ram em Uso: {ramUsada}% | Disco total: {discoTotal}GB | Disco em uso: {discoUsado}%")
        
         if uso > limiteCPU:
-            enviar_mensagem_slack(f":warning: ALERTA NA MÁQUINA: Nome: {nomeMaquina} Uso de CPU acima de {limiteCPU}%! Atual: {uso}%")
-
+            enviar_mensagem_slack(f":warning: ALERTA NA MÁQUINA: {nomeMaquina} Uso de CPU acima de {limiteCPU}%! Atual: {uso}%")
+            print("\n Notificação enviada no Slack - #alertas \n")
          
 
 
