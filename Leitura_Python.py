@@ -6,9 +6,9 @@ import csv
 CAPTURA_CSV = "captura_dados.csv"
 DADOS_CSV = "dados_gerais.csv"
 
-df = pd.read_csv(CAPTURA_CSV, sep="|", parse_dates=["timestamp"])
+df = pd.read_csv(CAPTURA_CSV, sep="|", parse_dates=["timestamp"], encoding="latin1")
 
-dfDados = pd.read_csv(DADOS_CSV, sep="|")
+dfDados = pd.read_csv(DADOS_CSV, sep="|", encoding="latin1")
 
 while True:
     print("\n=== Análise de Monitoramento ===")
