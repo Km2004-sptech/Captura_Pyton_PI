@@ -73,15 +73,15 @@ while True:
 
 
     elif opcao == "5":
-        tempos = df["timestamp"].view('int64') / 1e9  # converter para segundos
+        tempos = df["timestamp"].astype('int64') / 1e9  # converter para segundos
         valores_cpu = df["cpu"]
-        integral = round(np.trapz(valores_cpu, tempos), 2)
+        integral = round(np.trapezoid(valores_cpu, tempos), 2)
         print(f"Carga total acumulada da CPU: {integral}")
 
     elif opcao == "6":
-        tempos = df["timestamp"].view('int64') / 1e9
+        tempos = df["timestamp"].astype('int64') / 1e9
         valores_cpu = df["cpu"]
-        integral = np.trapz(valores_cpu, tempos)
+        integral = np.trapezoid(valores_cpu, tempos)
         duracao = tempos.iloc[-1] - tempos.iloc[0]
         media_integral = round(integral / duracao, 2) if duracao != 0 else 0
         print(f"Média temporal do uso de CPU: {media_integral}%")
