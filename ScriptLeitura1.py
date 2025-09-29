@@ -23,6 +23,16 @@ while contador < duracao:
     cpu = psutil.cpu_percent()  
     ram = psutil.virtual_memory().percent  
     disco = psutil.disk_usage("/").percent  
+    temperatura_cpu = psutil.sensors_temperatures(fahrenheit = False)
+    temperatura_disco = psutil.sensors_temperatures(fahrenheit = False)
+
+    local_cpu = temperatura_cpu['coretemp']
+    cpu_sensor = local_cpu[0]
+    temperatura_cpu_atual = cpu_sensor.current
+
+    local_disco = temperatura_disco['nvme']
+    disco_sensor = local_disco[0]
+    temperatura_disco_atual = disco_sensor.current
 
     dado = {
         'user': user
@@ -30,13 +40,15 @@ while contador < duracao:
         ,'cpu': cpu
         ,'ram': ram
         ,'disco': disco
+        ,'temperatura_cpu': temperatura_cpu_atual
+        ,'temperatura_disco': temperatura_disco_atual
     }
  
     # Salva no CSV
     data.append(dado)
 
 
-    print(f"\n Usuário: {user} | {timestamp} | CPU: {cpu}% | RAM: {ram}% | Disco: {disco}% |")
+    print(f"\n Usuário: {user} | {timestamp} | CPU: {cpu}% | Quantidade de CPU: {qtd_cpu}| RAM: {ram}% | Disco: {disco}% | Temperatura CPU: {temperatura_cpu_atual}ºC | Temperatura Disco: {temperatura_disco_atual}ºC")
   
 
     for proc in psutil.process_iter():
