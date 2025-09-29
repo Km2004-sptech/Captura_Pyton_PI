@@ -26,6 +26,10 @@ while contador < duracao:
     temperatura_cpu = psutil.sensors_temperatures(fahrenheit = False)
     temperatura_disco = psutil.sensors_temperatures(fahrenheit = False)
     memoria_swap = round(psutil.swap_memory().used / (1024 * 1024), 2)
+    processos_maquina = psutil.process_iter()
+
+    processos_list = list(processos_maquina)
+    quantidade_processos = len(processos_list)
 
     local_cpu = temperatura_cpu['coretemp']
     cpu_sensor = local_cpu[0]
@@ -44,13 +48,14 @@ while contador < duracao:
         ,'temperatura_cpu': temperatura_cpu_atual
         ,'temperatura_disco': temperatura_disco_atual
         ,'memoria_swap': memoria_swap
+        ,'quantidade_processos': quantidade_processos
     }
  
     # Salva no CSV
     data.append(dado)
 
 
-    print(f"\n Usuário: {user} | {timestamp} | CPU: {cpu}% | RAM: {ram}% | Disco: {disco}% | Temperatura CPU: {temperatura_cpu_atual}ºC | Temperatura Disco: {temperatura_disco_atual}ºC | Memória Swap: {memoria_swap}%")
+    print(f"\n Usuário: {user} | {timestamp} | CPU: {cpu}% | RAM: {ram}% | Disco: {disco}% | Temperatura CPU: {temperatura_cpu_atual}ºC | Temperatura Disco: {temperatura_disco_atual}ºC | Memória Swap: {memoria_swap}% | Quantidade de processos: {quantidade_processos}")
   
 
     for proc in psutil.process_iter():
