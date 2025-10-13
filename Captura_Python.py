@@ -5,6 +5,7 @@ import csv
 import requests
 from datetime import datetime
 import numpy as np
+import mysql.connector as mysql
 
 
 ARQUIVO = "dados_gerais.csv"
@@ -36,6 +37,30 @@ processador = platform.processor()
 nucleosFisicos = psutil.cpu_count(logical=False)
 nucleosLogicos = psutil.cpu_count(logical=True)
 nomeMaquina = platform.node()
+
+print(processador)
+print("Credenciais do banco de dados MySQL")
+opcaouser = input("Digite seu usuario:")
+opcaopassword = input("Digite sua senha:")
+opcaodatabase = input("Digite o nome da db:")
+ 
+
+try:
+    conexao = mysql.connect(
+                host="localhost",      
+                user=opcaouser,
+                password=opcaopassword,
+                database=opcaodatabase
+            )
+
+    cur = conexao.cursor()
+
+
+
+except mysql.connector.Error as err:
+    print(f"Erro ao conectar ao MySQL: {err}")
+    exit()
+
 
 with open(ARQUIVO, "a", newline="") as f:
         writer = csv.writer(f, delimiter="|")
@@ -73,13 +98,14 @@ try:
             enviar_mensagem_slack(f":warning: ALERTA NA MÁQUINA: {nomeMaquina} Uso de disco acima de 97%! Atual: {discoUsado}%")
             print("\n Notificação enviada no Slack - #alertas \n")
 
-         
 
 
         with open(ARQUIVO2, "a", newline="") as f:
             writer = csv.writer(f, delimiter="|")
             writer.writerow([timestamp, nomeMaquina, uso, ramTotal, ramUsada, discoTotal, discoUsado])
 
+        cur.execute(f"insert into teste (cpu, ram, disco) values ({uso}, {ramTotal}, {discoTotal})")
+        conexao.commit()
         time.sleep(10)
 
 except KeyboardInterrupt:#(Ctrl + c)

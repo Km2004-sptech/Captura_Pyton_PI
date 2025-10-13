@@ -2,13 +2,12 @@ import psutil
 import pandas as pd
 import time
 from datetime import datetime
+import mysql.connector as mysql
 
-duracao = int(input("Digite a duração da captura: "))
-contador = 0
-qtdParticoes = 0
-
+duracao = 1
+contador = 1
+qtdParticoes = 1
 data = []
-
 
 
 print("\n------- CAPTURANDO HARDWARE -------")
@@ -33,18 +32,17 @@ print(f"Quantidade de núcleos: {nucleosLogicos}")
 print(f"Quantidade de partições: {qtdParticoes}")
 
 for particao in Particoes:
-    contador = 1
-    contador + 1
+    
+    contador += 1
     total  = round(psutil.disk_usage("/").total / (1024**3),2)  
     print(f"QUantidade total da partição {contador}: {total}")
-    
-for particao in Particoes:
+
     usoDisco = psutil.disk_usage(particao.mountpoint)
-    print(particao.device)
-    print(particao.fstype)
-    print(particao.mountpoint)
-    print(particao.opts)
-    print(round(usoDisco.total / (1024**3),2))
+    print(f"Endereço da partição: {particao.device}")
+    print(f"Tipo do file system: {particao.fstype}")
+    print(f"Endereço do mountpoint: {particao.mountpoint}")
+    print(f"Opções da partição {particao.opts}")
+    print(f"Uso da partição {round(usoDisco.total / (1024**3),2)}KB")
 
 dados = {
     "Swap total ": swapTotal,
@@ -55,6 +53,8 @@ dados = {
     "Quantidade de partições do disco": qtdParticoes,
     "Data e hora da captura": timestamp
 }
+
+
 
 
 data.append(dados)

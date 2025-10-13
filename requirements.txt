@@ -1,6 +1,0 @@
-pandas
-psutil
-datetime
-requests
-numpy
-
